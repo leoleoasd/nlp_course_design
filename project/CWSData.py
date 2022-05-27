@@ -57,12 +57,69 @@ class CWSModule(pl.LightningDataModule):
         return DataLoader(
             self.predict_dataset,
             num_workers=1,
-            collate_fn=self.collate(),
+            collate_fn=self.collate(mode='predict'),
             batch_size=self.batch_size
         )
 
-    def collate(self):
+    def collate(self, mode='train'):
         def _collate(batch: list[str]):
+            if mode == 'predict':
+                segments = []
+                input_ids = []
+                attention_mask = []
+                token_type_ids = []
+                xxt = []
+                for ss in batch:
+                    xxt.append("<PAR>")
+                    ss = ss.rstrip()
+                    split = ss.split("。")
+                    if split[-1] == '':
+                        split = split[:-1]
+                    i = 0
+                    while i < len(split):
+                        s = split[i]
+                        if i == len(split) - 1 and ss[-1] != "。":
+                            pass
+                        else:
+                            s += "。"
+                        # while len(s) + len(split[i]) + 1 < 512:
+                        #     s += split[i]
+                        #     if i == len(split) - 1 and ss[-1] != "。":
+                        #         pass
+                        #     else:
+                        #         s += "。"
+                        #     i += 1
+                        #     if i == len(split):
+                        #         break
+                        xxt.append(s)
+                        segments.append(torch.zeros(len(s) + 2, dtype=torch.long))
+                        input_id = [self.tokenizer.convert_tokens_to_ids('[CLS]')]
+                        for j in s:
+                            input_id.append(
+                                self.tokenizer.convert_tokens_to_ids(j)
+                            )
+                        input_id.append(self.tokenizer.convert_tokens_to_ids('[SEP]'))
+                        input_id = torch.LongTensor(input_id)
+                        input_ids.append(input_id)
+                        attention_mask.append(torch.ones_like(input_id))
+                        token_type_ids.append(torch.zeros_like(input_id))
+                        i += 1
+                segments = pad_sequence(segments, True)
+                input_ids = pad_sequence(input_ids, True, self.tokenizer.convert_tokens_to_ids('[PAD]'))
+                attention_mask = pad_sequence(attention_mask, True)
+                token_type_ids = pad_sequence(token_type_ids, True)
+                segments = segments[:, :512]
+                input_ids = input_ids[:, :512]
+                attention_mask = attention_mask[:, :512]
+                token_type_ids = token_type_ids[:, :512]
+
+                return ((
+                            input_ids,
+                            attention_mask,                            token_type_ids,
+                        ),
+                        segments,
+                        xxt
+                )
             segments = []
             input_ids = []
             attention_mask = []

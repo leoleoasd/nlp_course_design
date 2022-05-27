@@ -121,27 +121,45 @@ def cli_main():
     if args.test:
         result = trainer.test(model=model, datamodule=data)
         print(result)
-    if args.predict:
-        result = trainer.predict(model=model, datamodule=data)
-        # print(result)
-        embed()
-        outs = []
-        for res in result:
-            scores = res[0][:, 1:-1]
-            text = res[1]
-            for s, t in zip(scores, text):
+    try:
+        if args.predict:
+            result = trainer.predict(model=model, datamodule=data)
+            # print(result)
+            embed()
+            outs = []
+            for res in result:
+                scores = res[0][:, 1:-1]
+                text = res[1]
                 out_text = ""
-                for i, c in zip(s, t):
-                    out_text += c
-                    if i:
-                        out_text += "  "
-                if out_text.endswith("。  "):
-                    out_text = out_text[:-3]
-                outs.append(out_text)
-        with open("out.txt", "wb") as f:
-            for o in outs:
-                f.write(o.encode("utf-8") + b"\r\n")
+                s_index = 0
+                index = 0
+                while index < len(text): #s, t in zip(scores, text):
+                    t = text[index]
+                    if t == '<PAR>':
+                        index += 1
+                        t = text[index]
+                        if out_text != "":
+                            if out_text.endswith("。  "):
+                                out_text = out_text[:-2]
+                            outs.append(out_text)
+                            out_text = ""
+                    s = scores[s_index]
 
+                    for i, c in zip(s, t):
+                        out_text += c
+                        if i:
+                            out_text += "  "
+                    s_index += 1
+                    index += 1
+                if out_text.endswith("。  "):
+                    out_text = out_text[:-2]
+                outs.append(out_text)
+            with open("out.txt", "wb") as f:
+                for o in outs:
+                    f.write(o.encode("utf-8") + b"\r\n")
+    except Exception as e:
+        print(e)
+    finally:
         embed()
 
 
