@@ -1,0 +1,38 @@
+\begin{thebibliography}{2}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{#1}
+\expandafter\ifx\csname urlstyle\endcsname\relax\else
+  \urlstyle{same}\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \DeclareUrlCommand\doi{\urlstyle{rm}}
+  \def\eprint#1#2{#2}
+\else
+  \def\doi#1{\href{https://doi.org/#1}{\nolinkurl{#1}}}
+  \let\eprint\href
+\fi
+
+\bibitem[Devlin et~al.(2019)Devlin, Chang, Lee, and
+  Toutanova]{devlinBERTPretrainingDeep2019}
+DEVLIN J, CHANG M~W, LEE K, et~al.
+\newblock {{BERT}}: {{Pre-training}} of {{Deep Bidirectional Transformers}} for
+  {{Language Understanding}}\allowbreak[C/OL]//\allowbreak
+Proceedings of the 2019 {{Conference}} of the {{North American Chapter}} of the
+  {{Association}} for {{Computational Linguistics}}: {{Human Language
+  Technologies}}, {{Volume}} 1 ({{Long}} and {{Short Papers}}).
+\newblock {Minneapolis, Minnesota}: {Association for Computational
+  Linguistics}, 2019: 4171-4186.
+\newblock DOI: \doi{10.18653/v1/N19-1423}.
+
+\bibitem[Ke et~al.(2021)Ke, Shi, Sun, Meng, Wang, and
+  Qiu]{kePretrainingMetaLearning2021}
+KE Z, SHI L, SUN S, et~al.
+\newblock Pre-training with {{Meta Learning}} for {{Chinese Word
+  Segmentation}}\allowbreak[C/OL]//\allowbreak
+Proceedings of the 2021 {{Conference}} of the {{North American Chapter}} of the
+  {{Association}} for {{Computational Linguistics}}: {{Human Language
+  Technologies}}.
+\newblock {Online}: {Association for Computational Linguistics}, 2021:
+  5514-5523.
+\newblock DOI: \doi{10.18653/v1/2021.naacl-main.436}.
+
+\end{thebibliography}

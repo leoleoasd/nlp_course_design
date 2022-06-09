@@ -75,6 +75,7 @@ class LitAutoEncoder(pl.LightningModule):
 
 
 def cli_main():
+    print(torch.cuda.is_available())
     pl.seed_everything(1234)
 
     # ------------
@@ -104,7 +105,7 @@ def cli_main():
     checkpoint_callback = ModelCheckpoint(save_top_k=2,
                                           monitor="valid/f1",
                                           mode='max',
-                                          filename="cws-e{epoch:02d}-{step}-f1{valid/f1:.4f}",
+                                          filename=f"{args.dataset_name}-{{epoch:02d}}-{{step}}-f1{{valid/f1:.4f}}",
                                           save_on_train_epoch_end=True,
                                           auto_insert_metric_name=False,
                                           )
@@ -124,8 +125,6 @@ def cli_main():
     try:
         if args.predict:
             result = trainer.predict(model=model, datamodule=data)
-            # print(result)
-            embed()
             outs = []
             for res in result:
                 scores = res[0][:, 1:-1]
@@ -136,13 +135,15 @@ def cli_main():
                 while index < len(text): #s, t in zip(scores, text):
                     t = text[index]
                     if t == '<PAR>':
-                        index += 1
-                        t = text[index]
                         if out_text != "":
                             if out_text.endswith("。  "):
                                 out_text = out_text[:-2]
                             outs.append(out_text)
                             out_text = ""
+                        index += 1
+                        if index == len(text):
+                            break
+                        t = text[index]
                     s = scores[s_index]
 
                     for i, c in zip(s, t):
@@ -154,12 +155,11 @@ def cli_main():
                 if out_text.endswith("。  "):
                     out_text = out_text[:-2]
                 outs.append(out_text)
-            with open("out.txt", "wb") as f:
+            with open(f"{args.dataset_name}-out.txt", "wb") as f:
                 for o in outs:
                     f.write(o.encode("utf-8") + b"\r\n")
     except Exception as e:
         print(e)
-    finally:
         embed()
 
 

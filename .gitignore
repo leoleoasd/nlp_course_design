@@ -8,6 +8,8 @@ wandb
 # C extensions
 *.so
 
+nlp_course_exp
+
 # Distribution / packaging
 .Python
 build/
